@@ -9,7 +9,7 @@ const AddProductPage = () => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const [formData, setFormData] = useState({ name: '', description: '', price: '', stock: '' });
+  const [formData, setFormData] = useState({ name: '', description: '', price: '', image: '' });
 
   const addProductMutation = useMutation({
     mutationFn: async (newProduct: any) => {
@@ -29,7 +29,7 @@ const AddProductPage = () => {
       name: formData.name,
       description: formData.description,
       price: parseFloat(formData.price),
-      stock: parseInt(formData.stock)
+      image: formData.image
     });
   };
 
@@ -47,9 +47,9 @@ const AddProductPage = () => {
                     <textarea className="w-full p-3 border rounded-xl mb-4" placeholder="Description" onChange={e => setFormData({...formData, description: e.target.value})} />
                 </div>
                 <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
-                    <h2 className="text-lg font-bold mb-4">Pricing & Inventory</h2>
+                    <h2 className="text-lg font-bold mb-4">Pricing & Images</h2>
                     <input className="w-full p-3 border rounded-xl mb-4" placeholder="Price" type="number" onChange={e => setFormData({...formData, price: e.target.value})} />
-                    <input className="w-full p-3 border rounded-xl mb-4" placeholder="Stock" type="number" onChange={e => setFormData({...formData, stock: e.target.value})} />
+                    <input className="w-full p-3 border rounded-xl mb-4" placeholder="Image URL" type="text" onChange={e => setFormData({...formData, image: e.target.value})} />
                 </div>
                 <button type="submit" className="col-span-2 bg-espresso text-white py-3 rounded-xl font-bold">Save Product</button>
             </form>
