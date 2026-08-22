@@ -60,14 +60,9 @@ const AddProductPage = () => {
       console.log("Saving product to DB...");
       await addProductMutation.mutateAsync({
         name: formData.name,
-        slug: formData.name.toLowerCase().replace(/ /g, '-'),
         description: formData.description,
         price: parseFloat(formData.price),
-        images: [publicUrl],
-        thumbnail: publicUrl,
-        category: 'Uncategorized',
-        rating: 5,
-        stock: 0
+        image_url: publicUrl
       });
       console.log("Mutation completed successfully");
     } catch (error) {
