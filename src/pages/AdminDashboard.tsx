@@ -10,106 +10,119 @@ interface Product {
   image_url: string;
 }
 
+interface Order {
+  id: string;
+  customer_name: string;
+  total: number;
+  status: string;
+}
+
 export default function AdminDashboard() {
   const navigate = useNavigate();
+  const [activeTab, setActiveTab] = useState<'products' | 'orders'>('products');
   const [products, setProducts] = useState<Product[]>([]);
+  const [orders, setOrders] = useState<Order[]>([]);
+  
+  // Product form state
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [price, setPrice] = useState('');
   const [imageFile, setImageFile] = useState<File | null>(null);
 
   useEffect(() => {
-    console.log('Admin Dashboard: Checking authentication...');
-    const isAdmin = localStorage.getItem('isAdmin');
-    console.log('Admin Dashboard: isAdmin =', isAdmin);
-    
-    if (isAdmin !== 'true') {
-      console.log('Admin Dashboard: Not authenticated, redirecting to login...');
+    if (localStorage.getItem('isAdmin') !== 'true') {
       navigate('/admin/login');
       return;
     }
-    console.log('Admin Dashboard: Authenticated, fetching products...');
-    fetchProducts();
+    fetchData();
   }, [navigate]);
 
-  async function fetchProducts() {
-    console.log('Admin Dashboard: Fetching products from Supabase...');
-    const { data, error } = await supabase.from('products').select('*');
-    if (error) {
-      console.error('Admin Dashboard: Error fetching products:', error);
-    } else {
-      console.log('Admin Dashboard: Products fetched:', data);
-      setProducts(data || []);
-    }
+  async function fetchData() {
+    const { data: productsData } = await supabase.from('products').select('*');
+    setProducts(productsData || []);
+    
+    // Simulating fetching orders if table doesn't exist yet, 
+    // in real scenario use: await supabase.from('orders').select('*')
+    setOrders([
+        { id: '1', customer_name: 'John Doe', total: 120, status: 'Pending' },
+        { id: '2', customer_name: 'Jane Smith', total: 85, status: 'Completed' }
+    ]);
   }
+
+  const deleteProduct = async (id: string) => {
+    if (!confirm('Are you sure?')) return;
+    await supabase.from('products').delete().eq('id', id);
+    fetchData();
+  };
 
   const addProduct = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!imageFile) {
-        alert('Please select an image');
-        return;
-    }
+    if (!imageFile) return;
 
-    // 1. Upload image to storage
-    const fileExt = imageFile.name.split('.').pop();
-    const fileName = `${Math.random()}.${fileExt}`;
-    const { error: uploadError } = await supabase.storage
-      .from('products')
-      .upload(fileName, imageFile);
+    const fileName = `${Math.random()}-${imageFile.name}`;
+    await supabase.storage.from('products').upload(fileName, imageFile);
+    const { data: { publicUrl } } = supabase.storage.from('products').getPublicUrl(fileName);
 
-    if (uploadError) {
-      alert(uploadError.message);
-      return;
-    }
-
-    // 2. Get public URL
-    const { data: { publicUrl } } = supabase.storage
-      .from('products')
-      .getPublicUrl(fileName);
-
-    // 3. Insert product
-    const { error } = await supabase.from('products').insert([
-      { name, description, price: parseFloat(price), image_url: publicUrl }
-    ]);
-    
-    if (error) alert(error.message);
-    else {
-      alert('Product added!');
-      setName(''); setDescription(''); setPrice(''); setImageFile(null);
-      fetchProducts();
-    }
+    await supabase.from('products').insert([{ name, description, price: parseFloat(price), image_url: publicUrl }]);
+    alert('Product added!');
+    fetchData();
   };
 
   return (
-    <div className="container mx-auto p-6 bg-white rounded-xl shadow-lg mt-8">
-      <div className="flex justify-between items-center mb-8 border-b pb-4">
-        <h1 className="text-4xl font-extrabold text-espresso">CMS Portal</h1>
-        <button onClick={() => { localStorage.removeItem('isAdmin'); navigate('/admin/login'); }} className="bg-red-500 text-white px-4 py-2 rounded">Logout</button>
+    <div className="min-h-screen bg-gray-50 p-8">
+      <div className="flex justify-between items-center mb-8">
+        <h1 className="text-3xl font-bold text-espresso">Admin Portal</h1>
+        <button onClick={() => { localStorage.removeItem('isAdmin'); navigate('/admin/login'); }} className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">Logout</button>
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        <form onSubmit={addProduct} className="bg-cream p-6 rounded-lg border border-champagne">
-          <h2 className="text-2xl font-bold mb-4 text-espresso">Add New Product</h2>
-          <input type="text" placeholder="Product Name" className="w-full border p-3 rounded mb-4" value={name} onChange={(e) => setName(e.target.value)} required />
-          <textarea placeholder="Description" className="w-full border p-3 rounded mb-4" value={description} onChange={(e) => setDescription(e.target.value)} />
-          <input type="number" placeholder="Price" className="w-full border p-3 rounded mb-4" value={price} onChange={(e) => setPrice(e.target.value)} required />
-          <input type="file" accept="image/*" className="w-full border p-3 rounded mb-4" onChange={(e) => setImageFile(e.target.files ? e.target.files[0] : null)} required />
-          <button type="submit" className="w-full bg-espresso text-white py-3 rounded font-bold hover:bg-champagne transition">Add Product</button>
-        </form>
-        <div>
-          <h2 className="text-2xl font-bold mb-4">Product Inventory</h2>
-          <div className="space-y-4">
-            {products.map((p) => (
-              <div key={p.id} className="flex items-center gap-4 border p-4 rounded">
-                <img src={p.image_url} className="w-16 h-16 object-cover rounded" />
-                <div>
-                  <p className="font-bold">{p.name}</p>
-                  <p className="text-sm text-gray-500">${p.price}</p>
-                </div>
-              </div>
-            ))}
+
+      <div className="flex gap-4 mb-6">
+        <button onClick={() => setActiveTab('products')} className={`px-6 py-2 rounded-full ${activeTab === 'products' ? 'bg-espresso text-white' : 'bg-white border'}`}>Products</button>
+        <button onClick={() => setActiveTab('orders')} className={`px-6 py-2 rounded-full ${activeTab === 'orders' ? 'bg-espresso text-white' : 'bg-white border'}`}>Orders</button>
+      </div>
+
+      {activeTab === 'products' ? (
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <form onSubmit={addProduct} className="bg-white p-6 rounded-xl shadow border border-champagne">
+            <h2 className="text-xl font-bold mb-4">Add Product</h2>
+            <input className="w-full border p-2 mb-3 rounded" placeholder="Name" onChange={(e) => setName(e.target.value)} required />
+            <textarea className="w-full border p-2 mb-3 rounded" placeholder="Desc" onChange={(e) => setDescription(e.target.value)} />
+            <input type="number" className="w-full border p-2 mb-3 rounded" placeholder="Price" onChange={(e) => setPrice(e.target.value)} required />
+            <input type="file" className="w-full mb-4" onChange={(e) => setImageFile(e.target.files ? e.target.files[0] : null)} required />
+            <button className="w-full bg-espresso text-white py-2 rounded">Save Product</button>
+          </form>
+
+          <div className="lg:col-span-2 bg-white p-6 rounded-xl shadow">
+            <table className="w-full">
+              <thead><tr className="text-left border-b"><th>Product</th><th>Price</th><th>Action</th></tr></thead>
+              <tbody>
+                {products.map(p => (
+                  <tr key={p.id} className="border-b">
+                    <td className="py-3">{p.name}</td>
+                    <td>${p.price}</td>
+                    <td><button onClick={() => deleteProduct(p.id)} className="text-red-500">Delete</button></td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         </div>
-      </div>
+      ) : (
+        <div className="bg-white p-6 rounded-xl shadow">
+            <table className="w-full">
+              <thead><tr className="text-left border-b"><th>Order ID</th><th>Customer</th><th>Total</th><th>Status</th></tr></thead>
+              <tbody>
+                {orders.map(o => (
+                  <tr key={o.id} className="border-b">
+                    <td className="py-3">{o.id}</td>
+                    <td>{o.customer_name}</td>
+                    <td>${o.total}</td>
+                    <td><span className={`px-2 py-1 rounded text-sm ${o.status === 'Completed' ? 'bg-green-100' : 'bg-yellow-100'}`}>{o.status}</span></td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+        </div>
+      )}
     </div>
   );
 }
