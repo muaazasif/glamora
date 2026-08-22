@@ -2,13 +2,32 @@ import React, { useState } from 'react';
 import { AdminSidebar } from '../components/admin/AdminSidebar';
 import { AdminHeader } from '../components/admin/AdminHeader';
 import { supabase } from '../lib/supabase';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
-...
+import { Search, Plus, Filter, MoreVertical, Loader2 } from 'lucide-react';
+
+const fetchProducts = async () => {
+  const { data, error } = await supabase.from('products').select('*');
+  if (error) throw error;
+  return data;
+};
+
 const ProductManagement = () => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const navigate = useNavigate();
-...
+
+  const { data: products, isLoading } = useQuery({
+    queryKey: ['products'],
+    queryFn: fetchProducts,
+  });
+
+  return (
+    <div className="flex min-h-screen bg-slate-50">
+      <AdminSidebar isCollapsed={isCollapsed} toggleSidebar={() => setIsCollapsed(!isCollapsed)} />
+      <div className="flex-1 flex flex-col">
+        <AdminHeader />
+        <main className="p-8">
+          <div className="flex items-center justify-between mb-8">
             <h1 className="text-3xl font-bold text-espresso">Products</h1>
             <button 
               onClick={() => navigate('/admin/products/add')}
@@ -17,8 +36,7 @@ const ProductManagement = () => {
               Add Product
             </button>
           </div>
-...
-
+          
           <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
             {isLoading ? (
                 <div className="p-8 flex items-center justify-center"><Loader2 className="animate-spin" /></div>
