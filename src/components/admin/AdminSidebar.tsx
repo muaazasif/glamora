@@ -1,15 +1,14 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { 
-  LayoutDashboard, 
-  ShoppingBag, 
-  Package, 
-  Users, 
-  BarChart3, 
-  Settings, 
-  ChevronLeft, 
+import {
+  LayoutDashboard,
+  ShoppingBag,
+  Package,
+  Users,
+  BarChart3,
+  Settings,
+  ChevronLeft,
   ChevronRight,
-  ShoppingCart,
   Tag,
   MessageSquare
 } from 'lucide-react';
