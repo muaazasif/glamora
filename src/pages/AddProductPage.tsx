@@ -48,9 +48,14 @@ const AddProductPage = () => {
       // 3. Save product
       addProductMutation.mutate({
         name: formData.name,
+        slug: formData.name.toLowerCase().replace(/ /g, '-'),
         description: formData.description,
         price: parseFloat(formData.price),
-        image: publicUrl
+        images: [publicUrl],
+        thumbnail: publicUrl,
+        category: 'Uncategorized',
+        rating: 5,
+        stock: 0
       });
     } catch (error) {
       console.error(error);
