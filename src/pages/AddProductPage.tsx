@@ -15,26 +15,29 @@ const AddProductPage = () => {
 
   const addProductMutation = useMutation({
     mutationFn: async (newProduct: any) => {
+      console.log("MutationFn starting with:", newProduct);
       const { data, error } = await supabase.from('products').insert([newProduct]);
+      console.log("Supabase response:", { data, error });
       if (error) throw error;
       return data;
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
+      console.log("Mutation success:", data);
       queryClient.invalidateQueries({ queryKey: ['products'] });
       navigate('/admin/products');
+    },
+    onError: (error) => {
+      console.error("Mutation error:", error);
     }
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     console.log("Form submitted");
-    console.log("File:", file);
-    console.log("FormData:", formData);
     
     if (!file) return alert('Please select an image');
 
     setUploading(true);
-    console.log("Uploading set to true");
     try {
       // 1. Upload file
       const fileExt = file.name.split('.').pop();
@@ -55,7 +58,7 @@ const AddProductPage = () => {
 
       // 3. Save product
       console.log("Saving product to DB...");
-      addProductMutation.mutate({
+      await addProductMutation.mutateAsync({
         name: formData.name,
         slug: formData.name.toLowerCase().replace(/ /g, '-'),
         description: formData.description,
@@ -66,12 +69,12 @@ const AddProductPage = () => {
         rating: 5,
         stock: 0
       });
+      console.log("Mutation completed successfully");
     } catch (error) {
       console.error("Submission error:", error);
       alert('Error uploading image or saving product. Check console.');
     } finally {
       setUploading(false);
-      console.log("Uploading set to false");
     }
   };
 
