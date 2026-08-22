@@ -3,58 +3,22 @@ import { AdminSidebar } from '../components/admin/AdminSidebar';
 import { AdminHeader } from '../components/admin/AdminHeader';
 import { supabase } from '../lib/supabase';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Search, Plus, Filter, MoreVertical, Loader2 } from 'lucide-react';
-
-const fetchProducts = async () => {
-  const { data, error } = await supabase.from('products').select('*');
-  if (error) throw error;
-  return data;
-};
-
+import { useNavigate } from 'react-router-dom';
+...
 const ProductManagement = () => {
   const [isCollapsed, setIsCollapsed] = useState(false);
-  const queryClient = useQueryClient();
-
-  const { data: products, isLoading } = useQuery({
-    queryKey: ['products'],
-    queryFn: fetchProducts,
-  });
-
-  const addProductMutation = useMutation({
-    mutationFn: async (newProduct: { name: string, price: number }) => {
-        const { data, error } = await supabase.from('products').insert([newProduct]);
-        if (error) throw error;
-        return data;
-    },
-    onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: ['products'] });
-    }
-  });
-
-  const handleAddProduct = async () => {
-    const name = prompt('Enter Product Name:');
-    const price = prompt('Enter Product Price:');
-    if (name && price) {
-        addProductMutation.mutate({ name, price: parseFloat(price) });
-    }
-  };
-
-  return (
-    <div className="flex min-h-screen bg-slate-50">
-      <AdminSidebar isCollapsed={isCollapsed} toggleSidebar={() => setIsCollapsed(!isCollapsed)} />
-      <div className="flex-1 flex flex-col">
-        <AdminHeader />
-        <main className="p-8">
-          <div className="flex items-center justify-between mb-8">
+  const navigate = useNavigate();
+...
             <h1 className="text-3xl font-bold text-espresso">Products</h1>
             <button 
-              onClick={handleAddProduct}
+              onClick={() => navigate('/admin/products/add')}
               className="flex items-center gap-2 bg-espresso text-white px-4 py-2 rounded-xl text-sm font-medium hover:bg-chocolate transition-colors">
               <Plus size={18} />
               Add Product
             </button>
           </div>
-          
+...
+
           <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
             {isLoading ? (
                 <div className="p-8 flex items-center justify-center"><Loader2 className="animate-spin" /></div>
