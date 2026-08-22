@@ -27,25 +27,34 @@ const AddProductPage = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.log("Form submitted");
+    console.log("File:", file);
+    console.log("FormData:", formData);
+    
     if (!file) return alert('Please select an image');
 
     setUploading(true);
+    console.log("Uploading set to true");
     try {
       // 1. Upload file
       const fileExt = file.name.split('.').pop();
       const fileName = `${Math.random()}.${fileExt}`;
+      console.log("Starting upload:", fileName);
       const { error: uploadError } = await supabase.storage
         .from('products')
         .upload(fileName, file);
 
       if (uploadError) throw uploadError;
+      console.log("Upload successful");
 
       // 2. Get public URL
       const { data: { publicUrl } } = supabase.storage
         .from('products')
         .getPublicUrl(fileName);
+      console.log("Public URL:", publicUrl);
 
       // 3. Save product
+      console.log("Saving product to DB...");
       addProductMutation.mutate({
         name: formData.name,
         slug: formData.name.toLowerCase().replace(/ /g, '-'),
@@ -58,10 +67,11 @@ const AddProductPage = () => {
         stock: 0
       });
     } catch (error) {
-      console.error(error);
-      alert('Error uploading image');
+      console.error("Submission error:", error);
+      alert('Error uploading image or saving product. Check console.');
     } finally {
       setUploading(false);
+      console.log("Uploading set to false");
     }
   };
 
