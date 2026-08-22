@@ -12,7 +12,7 @@ const data = [
   { name: 'Jun', revenue: 2390 },
 ];
 
-export const AdminDashboard = () => {
+export default function AdminDashboard() {
   const [isCollapsed, setIsCollapsed] = useState(false);
 
   return (

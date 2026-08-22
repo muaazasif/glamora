@@ -5,6 +5,7 @@ import ProductDetails from './pages/ProductDetails';
 import Cart from './pages/Cart';
 import Checkout from './pages/Checkout';
 import AdminDashboard from './pages/AdminDashboard';
+import ProductManagement from './pages/ProductManagement';
 import AdminLogin from './pages/AdminLogin';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
@@ -25,6 +26,7 @@ function App() {
             <Route path="/checkout" element={<Checkout />} />
             <Route path="/admin/login" element={<AdminLogin />} />
             <Route path="/admin/dashboard" element={<AdminDashboard />} />
+            <Route path="/admin/products" element={<ProductManagement />} />
           </Routes>
         </main>
         <Footer />
