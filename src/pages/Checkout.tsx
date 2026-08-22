@@ -27,12 +27,9 @@ export default function Checkout() {
     const orderData = {
         customer_name: formData.name,
         customer_email: formData.email,
-        customer_phone: formData.phone,
-        customer_address: `${formData.address}, ${formData.postalCode}`,
         total_amount: total,
         items: cart,
-        status: 'Pending',
-        payment_method: 'Cash on Delivery'
+        status: 'Pending'
     };
 
     const { error } = await supabase.from('orders').insert([orderData]);
