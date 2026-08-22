@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
+import { useNavigate } from 'react-router-dom';
 
 interface Product {
   id: string;
@@ -10,6 +11,7 @@ interface Product {
 }
 
 export default function AdminDashboard() {
+  const navigate = useNavigate();
   const [products, setProducts] = useState<Product[]>([]);
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
@@ -17,8 +19,12 @@ export default function AdminDashboard() {
   const [imageFile, setImageFile] = useState<File | null>(null);
 
   useEffect(() => {
+    if (localStorage.getItem('isAdmin') !== 'true') {
+      navigate('/admin/login');
+      return;
+    }
     fetchProducts();
-  }, []);
+  }, [navigate]);
 
   async function fetchProducts() {
     const { data } = await supabase.from('products').select('*');
@@ -64,7 +70,10 @@ export default function AdminDashboard() {
 
   return (
     <div className="container mx-auto p-6 bg-white rounded-xl shadow-lg mt-8">
-      <h1 className="text-4xl font-extrabold text-espresso mb-8 border-b pb-4">CMS Portal</h1>
+      <div className="flex justify-between items-center mb-8 border-b pb-4">
+        <h1 className="text-4xl font-extrabold text-espresso">CMS Portal</h1>
+        <button onClick={() => { localStorage.removeItem('isAdmin'); navigate('/admin/login'); }} className="bg-red-500 text-white px-4 py-2 rounded">Logout</button>
+      </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         <form onSubmit={addProduct} className="bg-cream p-6 rounded-lg border border-champagne">
           <h2 className="text-2xl font-bold mb-4 text-espresso">Add New Product</h2>
