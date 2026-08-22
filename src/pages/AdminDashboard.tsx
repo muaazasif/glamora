@@ -19,16 +19,28 @@ export default function AdminDashboard() {
   const [imageFile, setImageFile] = useState<File | null>(null);
 
   useEffect(() => {
-    if (localStorage.getItem('isAdmin') !== 'true') {
+    console.log('Admin Dashboard: Checking authentication...');
+    const isAdmin = localStorage.getItem('isAdmin');
+    console.log('Admin Dashboard: isAdmin =', isAdmin);
+    
+    if (isAdmin !== 'true') {
+      console.log('Admin Dashboard: Not authenticated, redirecting to login...');
       navigate('/admin/login');
       return;
     }
+    console.log('Admin Dashboard: Authenticated, fetching products...');
     fetchProducts();
   }, [navigate]);
 
   async function fetchProducts() {
-    const { data } = await supabase.from('products').select('*');
-    setProducts(data || []);
+    console.log('Admin Dashboard: Fetching products from Supabase...');
+    const { data, error } = await supabase.from('products').select('*');
+    if (error) {
+      console.error('Admin Dashboard: Error fetching products:', error);
+    } else {
+      console.log('Admin Dashboard: Products fetched:', data);
+      setProducts(data || []);
+    }
   }
 
   const addProduct = async (e: React.FormEvent) => {
