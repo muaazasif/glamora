@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { AdminSidebar } from '../components/admin/AdminSidebar';
 import { AdminHeader } from '../components/admin/AdminHeader';
 import { supabase } from '../lib/supabase';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
-import { Search, Plus, Filter, MoreVertical, Loader2 } from 'lucide-react';
+import { Plus, MoreVertical, Loader2 } from 'lucide-react';
 
 const fetchProducts = async () => {
   const { data, error } = await supabase.from('products').select('*');

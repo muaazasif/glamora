@@ -1,4 +1,3 @@
-import React, { useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import { 
   LayoutDashboard, 
@@ -9,11 +8,11 @@ import {
   Settings, 
   ChevronLeft, 
   ChevronRight,
-  ShoppingCart,
   Tag,
   MessageSquare
 } from 'lucide-react';
 import { cn } from '../../lib/utils';
+import React from 'react';
 
 interface SidebarItem {
   icon: React.ElementType;
