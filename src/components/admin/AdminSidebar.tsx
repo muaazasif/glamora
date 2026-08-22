@@ -22,7 +22,7 @@ interface SidebarItem {
 }
 
 const menuItems: SidebarItem[] = [
-  { icon: LayoutDashboard, label: 'Dashboard', path: '/admin' },
+  { icon: LayoutDashboard, label: 'Dashboard', path: '/admin/dashboard' },
   { icon: BarChart3, label: 'Analytics', path: '/admin/analytics' },
   { icon: ShoppingBag, label: 'Orders', path: '/admin/orders', badge: 12 },
   { icon: Package, label: 'Products', path: '/admin/products' },
