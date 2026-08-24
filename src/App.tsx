@@ -9,6 +9,7 @@ import AdminDashboard from './pages/AdminDashboard';
 import ProductManagement from './pages/ProductManagement';
 import Orders from './pages/Orders';
 import AddProductPage from './pages/AddProductPage';
+import EditProductPage from './pages/EditProductPage';
 import AdminLogin from './pages/AdminLogin';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
@@ -35,6 +36,7 @@ function App() {
               <Route path="/admin/orders" element={<Orders />} />
               <Route path="/admin/products" element={<ProductManagement />} />
               <Route path="/admin/products/add" element={<AddProductPage />} />
+              <Route path="/admin/products/edit/:id" element={<EditProductPage />} />
             </Routes>
           </main>
           <Footer />

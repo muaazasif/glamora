@@ -28,22 +28,22 @@ export default function Home() {
           >
             THE NEW SIGNATURE COLLECTION
           </motion.p>
-          <motion.h2 
+          <motion.h1 
             initial={{ y: 30, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.7, duration: 1 }}
             className="text-5xl md:text-8xl font-serif text-espresso mb-6 md:mb-8 uppercase tracking-tight"
           >
-            Beauty, Refined.
-          </motion.h2>
-          <motion.p 
+            BEAUTY, REFINED.
+          </motion.h1>
+          <motion.h2 
             initial={{ y: 30, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.9, duration: 1 }}
             className="text-lg md:text-xl text-espresso/80 mb-8 md:mb-12 max-w-lg mx-auto font-light tracking-wide"
           >
             A curated ritual of luminous skincare, sculpted color and timeless beauty.
-          </motion.p>
+          </motion.h2>
           <motion.div 
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}

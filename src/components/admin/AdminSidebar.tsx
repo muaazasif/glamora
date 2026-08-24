@@ -11,8 +11,10 @@ import {
   Tag,
   MessageSquare
 } from 'lucide-react';
-import { cn } from '../../lib/utils';
 import React from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '../../lib/supabase';
+import styles from '../../styles/components/AdminSidebar.module.css';
 
 interface SidebarItem {
   icon: React.ElementType;
@@ -21,54 +23,66 @@ interface SidebarItem {
   badge?: number;
 }
 
-const menuItems: SidebarItem[] = [
-  { icon: LayoutDashboard, label: 'Dashboard', path: '/admin/dashboard' },
-  { icon: BarChart3, label: 'Analytics', path: '/admin/analytics' },
-  { icon: ShoppingBag, label: 'Orders', path: '/admin/orders', badge: 12 },
-  { icon: Package, label: 'Products', path: '/admin/products' },
-  { icon: Users, label: 'Customers', path: '/admin/customers' },
-  { icon: Tag, label: 'Coupons', path: '/admin/coupons' },
-  { icon: MessageSquare, label: 'Reviews', path: '/admin/reviews', badge: 5 },
-  { icon: Settings, label: 'Settings', path: '/admin/settings' },
-];
-
 export const AdminSidebar = ({ isCollapsed, toggleSidebar }: { isCollapsed: boolean, toggleSidebar: () => void }) => {
-  return (
-    <aside className={cn(
-      "h-screen bg-white border-r border-slate-200 transition-all duration-300 flex flex-col",
-      isCollapsed ? "w-20" : "w-64"
-    )}>
-      <div className="p-6 flex items-center justify-between">
-        {!isCollapsed && <span className="font-bold text-xl text-espresso tracking-tighter">LuxeBeauty Admin</span>}
-        <button onClick={toggleSidebar} className="p-2 bg-slate-100 rounded-full hover:bg-slate-200 transition-colors">
-          {isCollapsed ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}
-        </button>
-      </div>
+  const { data: orders } = useQuery({
+    queryKey: ['orders'],
+    queryFn: async () => {
+      const { data } = await supabase.from('orders').select('status');
+      return data || [];
+    }
+  });
 
-      <nav className="flex-1 px-4 space-y-2 mt-4">
-        {menuItems.map((item) => (
-          <NavLink
-            key={item.label}
-            to={item.path}
-            className={({ isActive }) => cn(
-              "flex items-center gap-3 p-3 rounded-xl transition-all duration-200 group",
-              isActive ? "bg-champagne text-white shadow-md" : "text-slate-600 hover:bg-slate-50"
-            )}
-          >
-            <item.icon size={22} />
-            {!isCollapsed && (
-              <>
-                <span className="flex-1 font-medium">{item.label}</span>
-                {item.badge && (
-                  <span className="bg-espresso text-white text-xs font-bold px-2 py-0.5 rounded-full">
-                    {item.badge}
-                  </span>
-                )}
-              </>
-            )}
-          </NavLink>
-        ))}
-      </nav>
-    </aside>
+  const pendingOrders = orders?.filter(o => o.status === 'Pending').length || 0;
+
+  const menuItems: SidebarItem[] = [
+    { icon: LayoutDashboard, label: 'Dashboard', path: '/admin/dashboard' },
+    { icon: BarChart3, label: 'Analytics', path: '/admin/analytics' },
+    { icon: ShoppingBag, label: 'Orders', path: '/admin/orders', badge: pendingOrders },
+    { icon: Package, label: 'Products', path: '/admin/products' },
+    { icon: Users, label: 'Customers', path: '/admin/customers' },
+    { icon: Tag, label: 'Coupons', path: '/admin/coupons' },
+    { icon: MessageSquare, label: 'Reviews', path: '/admin/reviews', badge: 5 },
+    { icon: Settings, label: 'Settings', path: '/admin/settings' },
+  ];
+
+  return (
+    <>
+      <aside className={`${styles.sidebar} ${isCollapsed ? styles.sidebarCollapsed : styles.sidebarExpanded}`}>
+        <div className={styles.header}>
+          {!isCollapsed && <span className={styles.brandName}>LuxeBeauty Admin</span>}
+          <button onClick={toggleSidebar} className={styles.toggleButton}>
+            {isCollapsed ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}
+          </button>
+        </div>
+
+        <nav className={styles.nav}>
+          {menuItems.map((item) => (
+            <NavLink
+              key={item.label}
+              to={item.path}
+              className={({ isActive }) => 
+                `${styles.navLink} ${isActive ? styles.navLinkActive : ''}`
+              }
+            >
+              <item.icon size={22} />
+              {!isCollapsed && (
+                <>
+                  <span style={{flex: 1, fontWeight: 500}}>{item.label}</span>
+                  {item.badge && item.badge > 0 && (
+                    <span className={styles.badge}>
+                      {item.badge}
+                    </span>
+                  )}
+                </>
+              )}
+            </NavLink>
+          ))}
+        </nav>
+      </aside>
+      
+      {!isCollapsed && (
+        <div className={styles.mobileOverlay} onClick={toggleSidebar}></div>
+      )}
+    </>
   );
 };

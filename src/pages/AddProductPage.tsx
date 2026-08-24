@@ -88,7 +88,7 @@ const AddProductPage = () => {
                 </div>
                 <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
                     <h2 className="text-lg font-bold mb-4">Pricing & Images</h2>
-                    <input className="w-full p-3 border rounded-xl mb-4" placeholder="Price" type="number" onChange={e => setFormData({...formData, price: e.target.value})} required />
+                    <input className="w-full p-3 border rounded-xl mb-4" placeholder="Price (PKR)" type="number" onChange={e => setFormData({...formData, price: e.target.value})} required />
                     <input className="w-full p-3 border rounded-xl mb-4" type="file" onChange={e => setFile(e.target.files?.[0] || null)} required />
                 </div>
                 <button type="submit" disabled={uploading} className="col-span-2 bg-espresso text-white py-3 rounded-xl font-bold disabled:bg-gray-400">
