@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { AdminSidebar } from '../components/admin/AdminSidebar';
 import { AdminHeader } from '../components/admin/AdminHeader';
 import { supabase } from '../lib/supabase';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Loader2 } from 'lucide-react';
 
 export default function Orders() {
